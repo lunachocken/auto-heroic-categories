@@ -1,14 +1,14 @@
 #!/bin/bash
-# check if UV IS INSTALLED THEN DO
+# Check if uv is installed and prioritise as it's faster
 if  command -v uv &> /dev/null
 then # https://docs.astral.sh/uv/ Faster and better pip
-    echo "UV is installed. Using uv to install"
+    echo "uv is installed. Using uv to install"
     uv sync
     uv run env_check.py
     uv run heroic_categories.py
     uv run get_categories_for_game.py
 else
-    echo "UV is not installed. Using pip and python3 to install"
+    echo "uv is not installed. Using pip and python3 to install"
     python3 -m pip install uv
     python3 -m pip install -r requirements.txt
     python env_check.py

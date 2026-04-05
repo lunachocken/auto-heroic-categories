@@ -3,7 +3,7 @@
 Auto Heroic Categories, automatically categorizes your games from the 'heroic game launcher \
 library' into custom categories using data from IGDB (Internet Game Database).
 
-![](capture.gif)
+![](assets/categories.gif)
 
 ### Requirements
 * `sudo apt install wget git python3 python3-venv`.
