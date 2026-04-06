@@ -31,7 +31,7 @@ jobs:
               uses: sayyid5416/pyinstaller@v1
               with:
                   python_ver: '3.11'
-                  spec: 'main.spec'
+                  spec: 'build.spec'
                   pyproject: 'pyproject.toml'
                   upload_exe_with_name: 'auto-heroic-categories'
                   options: --onefile, --name "auto-heroic-categories", --windowed
