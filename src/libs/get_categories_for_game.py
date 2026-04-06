@@ -19,38 +19,42 @@ category_dict = {}
 categories = open(HEROIC_CONFIG)
 data = json.load(categories)
 
+
 def progressBar(it, prefix="", size=60, out=sys.stdout):  # Python3.6+
-        if len(it) == 0:
-            return
-        count = len(it)
-        start = time.time()  # time estimate start
+    if len(it) == 0:
+        return
+    count = len(it)
+    start = time.time()  # time estimate start
 
-        def show(j):
-            x = int(size * j / count)
-            # time estimate calculation and string
-            remaining = ((time.time() - start) / j) * (count - j)
-            mins, sec = divmod(remaining, 60)  # limited to minutes
-            time_str = f"{int(mins):02}:{sec:03.1f}"
-            print(
-                f"{prefix}[{'█' * x}{('.' * (size - x))}] {j}/{count} Est wait {time_str}",
-                end="\r",
-                file=out,
-                flush=True,
-            )
+    def show(j):
+        x = int(size * j / count)
+        # time estimate calculation and string
+        remaining = ((time.time() - start) / j) * (count - j)
+        mins, sec = divmod(remaining, 60)  # limited to minutes
+        time_str = f"{int(mins):02}:{sec:03.1f}"
+        print(
+            f"{prefix}[{'█' * x}{('.' * (size - x))}] {j}/{count} Est wait {time_str}",
+            end="\r",
+            file=out,
+            flush=True,
+        )
 
-        show(0.1)  # avoid div/0
-        for i, item in enumerate(it):
-            yield item
-            show(i + 1)
-        print("\n", flush=True, file=out)
+    show(0.1)  # avoid div/0
+    for i, item in enumerate(it):
+        yield item
+        show(i + 1)
+    print("\n", flush=True, file=out)
 
 
 def categorize_game_list():
     # Progress bar with ETA and count
-    
 
     for app_name in progressBar(game_library.library_dict, prefix="Progress:"):
-        url = "https://api.igdb.com/v4/games/?search=" + app_name + "&fields=id,name,genres"
+        url = (
+            "https://api.igdb.com/v4/games/?search="
+            + app_name
+            + "&fields=id,name,genres"
+        )
         response = post(
             url,
             **{
