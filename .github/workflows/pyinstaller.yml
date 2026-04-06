@@ -27,7 +27,7 @@ jobs:
               uses: sayyid5416/pyinstaller@v1
               with:
                   python_ver: '3.11'
-                  spec: 'src/build.spec'
-                  requirements: 'src/requirements.txt'
-                  upload_exe_with_name: 'My executable'
-                  options: --onefile, --name "My App", --windowed
+                  spec: 'build.spec'
+                  pyproject: 'pyproject.toml'
+                  upload_exe_with_name: 'auto-heroic-categories'
+                  options: --onefile, --name "auto-heroic-categories", --windowed
