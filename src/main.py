@@ -3,6 +3,7 @@ Main entrypoint
 
 Runs envcheck then sets categories
 """
+from loguru import logger
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -23,6 +24,7 @@ def main():
     env_check() # Check .env file and prompt if missing/invalid
     heroic_categories() # Create categories in heroic
     categorize_game_list() # Add categories to games in heroic based on IGDB genres
+    logger.info("Done. Restart Heroic")
 
 if __name__ == "__main__":
     main()

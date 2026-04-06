@@ -50,13 +50,15 @@ def basic_valid(text):
                     cursor_position=len(document.text),
                 )
             # path based validation for PATHO and HEROIC_CONFIG
-            if text in ["PATHO", "HEROIC_CONFIG"]:
-                if not os.path.isabs(document.text.strip()):
+            if text in ["PATHO", "HEROIC_CONFIG", "optional"]:
+                # Optional needs to test combined
+                text_data=os.path.join(os.environ["PATHO"], document.text.strip()) if text == "optional" else document.text.strip()
+                if not os.path.isabs(text_data):
                     raise ValidationError(
                         message="Please enter an absolute path.",
                         cursor_position=len(document.text),
                     )
-                if not os.path.exists(document.text.strip()):
+                if not os.path.exists(text_data):
                     raise ValidationError(
                         message="Path does not exist.",
                         cursor_position=len(document.text),
@@ -67,12 +69,11 @@ def basic_valid(text):
                             message="HEROIC_CONFIG must be a .json file.",
                             cursor_position=len(document.text),
                         )
-                if text == "PATHO":
-                    if not os.path.isdir(document.text.strip()):
-                        raise ValidationError(
-                            message="PATHO must be a valid directory.",
-                            cursor_position=len(document.text),
-                        )
+            if text == "PATHO" and not os.path.isdir(document.text.strip()):
+                raise ValidationError(
+                message="PATHO must be a valid directory.",
+                    cursor_position=len(document.text),
+                )
 
     return BasicValidator()
 
@@ -112,6 +113,11 @@ def compile_options(key):
         found_patho = find_patho()
         if found_patho:
             return [found_patho]
+    elif key in optional_env_keys.values():
+        # For optional env keys, suggest the PATHO as base path if it exists
+        patho = os.environ.get("PATHO", "")
+        if patho and os.path.exists(patho):
+            return ["gog_library.json", "legendary_library.json", "amazon_library.json"]
     return []
 
 def prompt(env_key, part="1/3", optional=False):
@@ -119,7 +125,7 @@ def prompt(env_key, part="1/3", optional=False):
     options = compile_options(env_key)
     completer = WordCompleter(options, ignore_case=True)
 
-    # We use a Session for better control than the Dialog shortcut
+    # Session seems to work better than dialog as autocomplete is weird?
     session = PromptSession()
 
     print(f"\n--- Environment Variable Setup ({part}) ---")
@@ -134,6 +140,8 @@ def prompt(env_key, part="1/3", optional=False):
             complete_while_typing=True, 
             validator=basic_valid(env_key if not optional else "optional"),
         )
+        if result is "" or len(result) < 5: # Could be cancelled
+            raise KeyboardInterrupt
         return result
     except KeyboardInterrupt:
         return None
@@ -154,7 +162,6 @@ def prompt_env():
             f.write(f"{key}={os.environ[key]}\n")
 
     # if any optional env keys are set, skip the prompt
-    logger.debug(f"Optional env keys: {optional_env_keys.values()}")
     if any(os.environ.get(opt_key, "") != "" for opt_key in optional_env_keys.values()):
         return
 
@@ -164,12 +171,15 @@ def prompt_env():
         values=[("epicgames", "Epic Games"), ("gog", "GOG"), ("amazon", "Amazon")],
         # validate path exists but not required
     ).run()
-    if optional is not None:
+    if optional is not None and len(optional) > 0:
         for store in optional:
             opt_key = optional_env_keys[store]
-            val = prompt(opt_key, part="3/3", optional=True)
+            val = prompt(opt_key, part="3/3", optional=True,)
             if val is not None and val != "":
                 os.environ[opt_key] = val
+    else:
+        logger.info("User cancelled optional env setup. Exiting")
+        exit(0)
     # Save optional env keys to .env file
     with open(".env", "a") as f:
         for opt_key in optional_env_keys.values():
