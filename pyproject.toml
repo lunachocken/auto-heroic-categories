@@ -21,3 +21,8 @@ dependencies = [
     "urllib3==2.2.1",
     "virtualenv==20.26.2",
 ]
+
+[project.optional-dependencies]
+pyinstaller = [
+    "pyinstaller>=6.19.0",
+]
