@@ -5,6 +5,9 @@ library' into custom categories using data from IGDB (Internet Game Database).
 
 ![](assets/categories.gif)
 
+#### Asciinema recording (Click image)
+[![asciicast](https://asciinema.org/a/wGTimQ4HEAu3RiX2.svg)](https://asciinema.org/a/wGTimQ4HEAu3RiX2)
+
 ### Requirements
 * `sudo apt install wget git python3 python3-venv`.
 * `git clone https://github.com/arfonso01/auto-heroic-categories.git`. 
