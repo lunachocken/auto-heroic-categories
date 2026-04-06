@@ -41,20 +41,10 @@ jobs:
     #       name: auto-heroic-categories
     #       path: ./dist/auto-heroic-categories
 
-  upload-to-release:
-    if: github.event_name == 'release'
-    needs: pyinstaller-build
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - name: Download artifact
-        uses: actions/download-artifact@v4
+        - name: Upload to Release
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v1
         with:
-          name: auto-heroic-categories
-          path: dist
-
-      - name: Upload to GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: dist/auto-heroic-categories
+          files: ./dist/auto-heroic-categories
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
