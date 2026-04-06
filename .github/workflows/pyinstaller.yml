@@ -5,6 +5,10 @@ on:
           description: 'Python version to use'
           required: true
           default: '3.11'
+    release:
+        types:
+            - published
+
 jobs:
     pyinstaller-build:
         runs-on: ubuntu-latest
@@ -31,3 +35,18 @@ jobs:
                   pyproject: 'pyproject.toml'
                   upload_exe_with_name: 'auto-heroic-categories'
                   options: --onefile, --name "auto-heroic-categories", --windowed
+
+    upload-to-release:
+        needs: pyinstaller-build
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v3
+
+            - name: Upload Executable to Release
+              uses: actions/upload-release-asset@v1
+              with:
+                  upload_url: ${{ github.event.release.upload_url }}
+                  asset_path: ./dist/auto-heroic-categories
+                  asset_name: auto-heroic-categories
+                  asset_content_type: application/octet-stream
