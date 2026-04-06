@@ -35,11 +35,11 @@ jobs:
           spec: 'build.spec'
           upload_exe_with_name: 'auto-heroic-categories'
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: auto-heroic-categories
-          path: ./dist/auto-heroic-categories
+    #   - name: Upload artifact
+    #     uses: actions/upload-artifact@v4
+    #     with:
+    #       name: auto-heroic-categories
+    #       path: ./dist/auto-heroic-categories
 
   upload-to-release:
     needs: pyinstaller-build
