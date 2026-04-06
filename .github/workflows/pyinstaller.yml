@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -36,7 +36,7 @@ jobs:
           upload_exe_with_name: 'auto-heroic-categories'
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: auto-heroic-categories
           path: ./dist/auto-heroic-categories
@@ -47,7 +47,7 @@ jobs:
     if: github.event_name == 'release'   # ← skip on workflow_dispatch
     steps:
       - name: Download artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: auto-heroic-categories
           path: ./dist/
