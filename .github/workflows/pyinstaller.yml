@@ -35,16 +35,10 @@ jobs:
           spec: 'build.spec'
           upload_exe_with_name: 'auto-heroic-categories'
 
-    #   - name: Upload artifact
-    #     uses: actions/upload-artifact@v4
-    #     with:
-    #       name: auto-heroic-categories
-    #       path: ./dist/auto-heroic-categories
-
-        - name: Upload to Release
+      - name: Upload to Release
         if: github.event_name == 'release'
         uses: softprops/action-gh-release@v1
         with:
-          files: ./dist/auto-heroic-categories
+            files: ./dist/auto-heroic-categories
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
