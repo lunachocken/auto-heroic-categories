@@ -52,7 +52,11 @@ def basic_valid(text):
             # path based validation for PATHO and HEROIC_CONFIG
             if text in ["PATHO", "HEROIC_CONFIG", "optional"]:
                 # Optional needs to test combined
-                text_data=os.path.join(os.environ["PATHO"], document.text.strip()) if text == "optional" else document.text.strip()
+                text_data = (
+                    os.path.join(os.environ["PATHO"], document.text.strip())
+                    if text == "optional"
+                    else document.text.strip()
+                )
                 if not os.path.isabs(text_data):
                     raise ValidationError(
                         message="Please enter an absolute path.",
@@ -71,11 +75,12 @@ def basic_valid(text):
                         )
             if text == "PATHO" and not os.path.isdir(document.text.strip()):
                 raise ValidationError(
-                message="PATHO must be a valid directory.",
+                    message="PATHO must be a valid directory.",
                     cursor_position=len(document.text),
                 )
 
     return BasicValidator()
+
 
 def find_heroic_config():
     """Find heroic config file in common locations"""
@@ -89,11 +94,14 @@ def find_heroic_config():
             return location
     return None
 
+
 def find_patho():
     """Find PATHO='/home/yourUser/.var/app/com.heroicgameslauncher.hgl/config/heroic/store_cache/'
     in common locations"""
     possible_locations = [
-        os.path.expanduser("~/.var/app/com.heroicgameslauncher.hgl/config/heroic/store_cache/"),
+        os.path.expanduser(
+            "~/.var/app/com.heroicgameslauncher.hgl/config/heroic/store_cache/"
+        ),
         os.path.expanduser("~/.config/heroic/store_cache/"),
         os.path.expanduser("~/AppData/Roaming/heroic/store_cache/"),
         os.path.expanduser("~/Library/Application Support/heroic/store_cache/"),
@@ -102,6 +110,7 @@ def find_patho():
         if os.path.exists(location):
             return location
     return None
+
 
 def compile_options(key):
     """Compile options for prompt completer based on key"""
@@ -120,6 +129,7 @@ def compile_options(key):
             return ["gog_library.json", "legendary_library.json", "amazon_library.json"]
     return []
 
+
 def prompt(env_key, part="1/3", optional=False):
     example_env = dotenv.dotenv_values("env_example") or {}
     options = compile_options(env_key)
@@ -137,10 +147,10 @@ def prompt(env_key, part="1/3", optional=False):
         result = session.prompt(
             f"Input value for {env_key}: ",
             completer=completer,
-            complete_while_typing=True, 
+            complete_while_typing=True,
             validator=basic_valid(env_key if not optional else "optional"),
         )
-        if result is "" or len(result) < 5: # Could be cancelled
+        if result is "" or len(result) < 5:  # Could be cancelled
             raise KeyboardInterrupt
         return result
     except KeyboardInterrupt:
@@ -174,7 +184,11 @@ def prompt_env():
     if optional is not None and len(optional) > 0:
         for store in optional:
             opt_key = optional_env_keys[store]
-            val = prompt(opt_key, part="3/3", optional=True,)
+            val = prompt(
+                opt_key,
+                part="3/3",
+                optional=True,
+            )
             if val is not None and val != "":
                 os.environ[opt_key] = val
     else:

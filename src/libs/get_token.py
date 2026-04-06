@@ -12,5 +12,7 @@ def authorization():
         x = requests.post(url)
         return x.json()["access_token"]
     except KeyError as e:
-        logger.error("Failed to get access token. Check your CLIENT_ID and CLIENT_SECRET.")
+        logger.error(
+            "Failed to get access token. Check your CLIENT_ID and CLIENT_SECRET."
+        )
         raise e

@@ -19,6 +19,8 @@ def open_library(library):
 
 
 library_dict = {}
+
+
 def update_library(library, root_json: str):
     try:
         data = json.load(library)
@@ -46,9 +48,11 @@ libs = ["GOG_LIBRARY", "AMAZON_LIBRARY", "EPIC_LIBRARY"]
 libraries = {}
 for library in libs:
     if library in os.environ and os.environ[library] != "":
-        libraries[library+"_PATH"] = os.path.join(env("PATHO"), env(library))
-        libraries[library] = open_library(libraries[library+"_PATH"])
-        update_library(libraries[library], "games" if library == "GOG_LIBRARY" else "library")
+        libraries[library + "_PATH"] = os.path.join(env("PATHO"), env(library))
+        libraries[library] = open_library(libraries[library + "_PATH"])
+        update_library(
+            libraries[library], "games" if library == "GOG_LIBRARY" else "library"
+        )
 
 # GOG_LIBRARY = os.path.join(env("PATHO"), env("GOG_LIBRARY"))
 # AMAZON_LIBRARY = os.path.join(env("PATHO"), env("AMAZON_LIBRARY"))
@@ -57,10 +61,6 @@ for library in libs:
 # GOG_LIBRARY = open_library(GOG_LIBRARY)
 # AMAZON_LIBRARY = open_library(AMAZON_LIBRARY)
 # EPIC_LIBRARY = open_library(EPIC_LIBRARY)
-
-
-
-
 
 
 # library(GOG_LIBRARY, "games")
