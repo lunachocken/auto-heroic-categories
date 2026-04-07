@@ -150,7 +150,7 @@ def prompt(env_key, part="1/3", optional=False):
             complete_while_typing=True,
             validator=basic_valid(env_key if not optional else "optional"),
         )
-        if result is "" or len(result) < 5:  # Could be cancelled
+        if result == "" or len(result) < 5:  # Could be cancelled
             raise KeyboardInterrupt
         return result
     except KeyboardInterrupt:

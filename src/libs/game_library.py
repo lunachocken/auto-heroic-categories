@@ -1,35 +1,35 @@
 import json
-from dotenv import load_dotenv
 import os
-
+from loguru import logger
 from prompt_toolkit import enums
 
 env = os.getenv
-load_dotenv()
 
 
-def open_library(library):
+def open_library(library_path) -> dict:
     try:
-        return open(library, encoding="utf8")
+        # return open(library, encoding="utf8")
+        with open(library_path, encoding="utf8") as f:
+            return json.load(f)
     except FileNotFoundError as e:
-        print("Some library locations not found: " + str(e))
+        logger.error("Library not found: %s\nError: %s" % (library_path, str(e)))
     except TypeError as e:
-        print("Check your .env files has been updated. Error: " + str(e))
+        logger.error("Check your .env files has been updated. Error: " + str(e))
         exit(1)
 
 
 library_dict = {}
 
 
-def update_library(library, root_json: str):
+def update_library(library_json: dict, root_json: str):
+    logger.info("Updating library dictionary with %s" % root_json)
     try:
-        data = json.load(library)
-        for i in data[root_json]:
-            if "gog" in str(library):
+        for i in library_json[root_json]:
+            if "gog" in str(library_json):
                 appname = i["app_name"] + "_gog"
-            if "legendary" in str(library):
+            if "legendary" in str(library_json):
                 appname = i["app_name"] + "_legendary"
-            if "nile" in str(library):
+            if "nile" in str(library_json):
                 appname = i["app_name"] + "_nile"
 
             try:
@@ -38,31 +38,15 @@ def update_library(library, root_json: str):
             except KeyError:
                 continue
 
-        library.close()
     except (KeyError, AttributeError) as e:
-        print(str(e) + ". Game library likely not found.")
-        library.close()
+        logger.error(str(e) + ". Game library likely not found.")
 
 
-libs = ["GOG_LIBRARY", "AMAZON_LIBRARY", "EPIC_LIBRARY"]
-libraries = {}
-for library in libs:
+libraries = ["GOG_LIBRARY", "AMAZON_LIBRARY", "EPIC_LIBRARY"]
+for library in libraries:
     if library in os.environ and os.environ[library] != "":
-        libraries[library + "_PATH"] = os.path.join(env("PATHO"), env(library))
-        libraries[library] = open_library(libraries[library + "_PATH"])
-        update_library(
-            libraries[library], "games" if library == "GOG_LIBRARY" else "library"
-        )
-
-# GOG_LIBRARY = os.path.join(env("PATHO"), env("GOG_LIBRARY"))
-# AMAZON_LIBRARY = os.path.join(env("PATHO"), env("AMAZON_LIBRARY"))
-# EPIC_LIBRARY = os.path.join(env("PATHO"), env("EPIC_LIBRARY"))
-
-# GOG_LIBRARY = open_library(GOG_LIBRARY)
-# AMAZON_LIBRARY = open_library(AMAZON_LIBRARY)
-# EPIC_LIBRARY = open_library(EPIC_LIBRARY)
+        library_path = os.path.join(env("PATHO"), env(library))
+        library_json = open_library(library_path)
+        update_library(library_json, root_json="games" if library == "GOG_LIBRARY" else "library")
 
 
-# library(GOG_LIBRARY, "games")
-# library(AMAZON_LIBRARY, "library")
-# library(EPIC_LIBRARY, "library")
