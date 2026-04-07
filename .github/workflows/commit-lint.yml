@@ -1,0 +1,50 @@
+name: Commit Message Lint
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  commit-lint:
+    name: Validate Commit Messages
+    runs-on: ubuntu-latest
+    if: github.actor == 'lunachocken'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate commit messages
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            BASE=${{ github.event.pull_request.base.sha }}
+            HEAD=${{ github.event.pull_request.head.sha }}
+          else
+            BASE=${{ github.event.before }}
+            HEAD=${{ github.sha }}
+          fi
+
+          # Pattern: optional type prefix (e.g. "fix:", "feat:") followed by a
+          # description of at least 10 characters.
+          PATTERN="^([a-zA-Z]+(\([a-zA-Z0-9_-]+\))?!?: ).{10,}|^.{10,}"
+
+          git log --format="%s" "${BASE}..${HEAD}" | while IFS= read -r msg; do
+            if [ -z "$msg" ]; then
+              continue
+            fi
+            if ! echo "$msg" | grep -Eq "${PATTERN}"; then
+              echo "❌ Commit message is too short or not meaningful enough:"
+              echo "   \"$msg\""
+              echo ""
+              echo "Commit messages must be at least 10 characters and ideally follow"
+              echo "the conventional commits format: <type>(<scope>): <description>"
+              echo "Examples:"
+              echo "  feat: add progress bar to category sync"
+              echo "  fix: handle missing game library gracefully"
+              echo "  refactor: replace print with loguru logger"
+              exit 1
+            fi
+            echo "✅ $msg"
+          done
