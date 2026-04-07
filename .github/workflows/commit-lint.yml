@@ -9,6 +9,8 @@ jobs:
     name: Validate Commit Messages
     runs-on: ubuntu-latest
     if: github.actor == 'lunachocken'
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout code
@@ -30,7 +32,8 @@ jobs:
           # description of at least 10 characters.
           PATTERN="^([a-zA-Z]+(\([a-zA-Z0-9_-]+\))?!?: ).{10,}|^.{10,}"
 
-          git log --format="%s" "${BASE}..${HEAD}" | while IFS= read -r msg; do
+          FAILED=0
+          while IFS= read -r msg; do
             if [ -z "$msg" ]; then
               continue
             fi
@@ -44,7 +47,10 @@ jobs:
               echo "  feat: add progress bar to category sync"
               echo "  fix: handle missing game library gracefully"
               echo "  refactor: replace print with loguru logger"
-              exit 1
+              FAILED=1
+            else
+              echo "✅ $msg"
             fi
-            echo "✅ $msg"
-          done
+          done < <(git log --format="%s" "${BASE}..${HEAD}")
+
+          exit $FAILED
